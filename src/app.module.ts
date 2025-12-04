@@ -7,9 +7,10 @@ import { CartsController } from './carts/carts.controller';
 import { CartsModule } from './carts/carts.module';
 import { OrdersService } from './orders/orders.service';
 import { OrdersModule } from './orders/orders.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
-  imports: [BooksModule, CartsModule, OrdersModule],
+  imports: [BooksModule, CartsModule, OrdersModule, RedisModule],
   controllers: [AppController, CartsController],
   providers: [AppService, BooksService, OrdersService],
 })
