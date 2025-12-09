@@ -58,6 +58,7 @@ describe('CartsService', () => {
     // (2) error flow 
     // 2.1 should handle errors from repository when creating cart
     // 2.2 should handle erros from service when checking bookstock
+    // 2.3 should handle errors from repository when get cart
 
 
     beforeEach( async () => {
@@ -138,11 +139,24 @@ describe('CartsService', () => {
 
 
     it('should handle errors from repository when creating cart', async () => {
-      
+      mockCartRepo.createCart = jest.fn().mockRejectedValue(new Error('Redis error'));
+
+      await expect( service.addItem("bookId", 10, null) ).rejects.toThrow('Redis error');
+      expect( mockCartRepo.createCart ).toHaveBeenCalled();
+    });
+
+     it('should handle errors from repository when get cart', async () => {
+      mockCartRepo.getCart = jest.fn().mockRejectedValue(new Error('Redis error'));
+
+      await expect( service.addItem("bookId", 10, null) ).rejects.toThrow('Redis error');
+      expect( mockCartRepo.getCart ).toHaveBeenCalled();
     });
 
     it('should handle erros from service when checking bookstock', async () => {
-      
+      mockBooksService.hasEnoughStock = jest.fn().mockRejectedValue(new Error('Service error'));
+
+      await expect( service.addItem("bookId", 10, null) ).rejects.toThrow('Service error');
+      expect( mockBooksService.hasEnoughStock ).toHaveBeenCalled();
     });
 
 
