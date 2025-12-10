@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from '../redis/redis.service';
+import { json } from 'stream/consumers';
 
 
 
@@ -38,6 +39,18 @@ export class CartsRepository {
         }
     }
 
+    async updateCart(cartId: string, cart: Cart): Promise<Cart> {
+        if (!cartId) {
+            throw new Error('cartId is required to update a cart');
+        }
+        try {
+            await this.redisService.set(cartId, JSON.stringify(cart))
+        } catch (error) {
+            throw error;
+        }
+
+        return cart;
+    } 
 
     async createCart(cartId: string, initialItem: CartItem): Promise<Cart> {
         if (!cartId) {
@@ -48,12 +61,8 @@ export class CartsRepository {
             if (existingCart) {
                 throw new Error('Cart with this ID already exists');
             }
-
             const newCart: Cart = { items: [initialItem] };
-            const status = await this.redisService.set(cartId, JSON.stringify(newCart));
-            if (status !== 'OK') {
-                throw new Error('Failed to create cart in Redis');
-            }
+            await this.redisService.set(cartId, JSON.stringify(newCart));
             return newCart;
         } catch (err) {
             throw err;

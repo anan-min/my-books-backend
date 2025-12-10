@@ -171,4 +171,76 @@ describe('CartsRepository', () => {
 
     })
 
+
+    describe('updateCart',  () => {
+        // should not call redis set when cartId is empty
+        // should update cart and return updated cart 
+        // should handle errors from redis service
+
+        it('should not call redis  set when cartId is empty', async () => {
+            const cartId = ""
+            const cart: Cart = {
+                items: [
+                    {
+                        _id: "valid_id",
+                        qty: 1
+                    }
+                ]
+            }
+            mockRedis.set = jest.fn();
+            await expect(repo.updateCart(cartId, cart)).rejects.toThrow("cartId is required to update a cart")
+            expect(mockRedis.set).not.toHaveBeenCalled()
+        });
+
+
+        it('should update cart and return updated cart', async () => {
+            const cartId = "valid_id"
+            const cart: Cart = {
+                items: [
+                    {
+                        _id: "valid_id",
+                        qty: 1
+                    }
+                ]
+            }
+            mockRedis.set = jest.fn().mockResolvedValue("OK")
+            const result = await repo.updateCart(cartId, cart);
+            expect(mockRedis.set).toHaveBeenCalledTimes(1)
+            expect(result).toEqual(cart);
+        });
+        
+
+        it('should handle errors from redis service', async () => {
+            const cartId = "valid_id"
+            const cart: Cart = {
+                items: [
+                    {
+                        _id: "valid_id",
+                        qty: 1
+                    }
+                ]
+            }
+            mockRedis.set = jest.fn().mockRejectedValue(new Error('Redis error'));
+            await expect(repo.updateCart(cartId, cart)).rejects.toThrow(new Error('Redis error'))
+            expect(mockRedis.set).toHaveBeenCalledWith(cartId, JSON.stringify(cart));
+        });
+        
+
+        it('should update cart and return cart', async () => {
+            const cartId = "valid_id"
+            const cart: Cart = {
+                items: [
+                    {
+                        _id: "valid_id",
+                        qty: 1
+                    }
+                ]
+            }
+            mockRedis.set = jest.fn().mockResolvedValue("OK")
+            const result = await repo.updateCart(cartId, cart)
+            expect(result).toEqual(cart);
+            expect(mockRedis.set).toHaveBeenCalledWith(cartId, JSON.stringify(cart))
+        });
+
+    }) 
 });

@@ -43,6 +43,23 @@ export class BookRepository {
         return book.stock;
     }
 
+    async getBooksByIds(ids: string[]): Promise<BookData[]> {
+        if(ids.length === 0){
+            return [] 
+        }
+
+        try {
+            const books = await this.bookModel.find({
+                _id: { $in: ids }
+            }).lean().exec();
+            return books.map(book => this.bookToBookData(book._id));
+        } catch (error) {
+            throw error;
+        }
+
+
+    }
+
 
     
 

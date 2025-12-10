@@ -200,4 +200,49 @@ describe('BookRepository', () => {
     })
 
 
+
+
+    describe('get books by ids', () => {
+        // should be defined 
+        // should return empty array if no ids provided
+        // should return books matching the provided ids
+        // should handle errors from the database
+
+        it('should be defined', () => {
+            expect(repo.getBooksByIds).toBeDefined();
+        })
+
+        it('should return empty array if no ids provided', async () => {
+            // shouldn't call find 
+            // should return [] 
+            mockBookModel.find.mockResolvedValue(mockFindChain([]))
+            const result = await repo.getBooksByIds([])
+            expect(result).toEqual([])
+        })
+
+        it('should return books matching the provided ids', async () => {
+            const books = mockBookFromDatabase(3);
+            const ids = books.map(book => book._id.toString());
+
+            mockBookModel.find.mockReturnValue(mockFindChain(books));
+            const result = await repo.getBooksByIds(ids);
+            const resultIds = result.map(book => book._id);
+
+            expect(resultIds).toEqual(ids);
+            expect(mockBookModel.find).toHaveBeenCalledWith({ _id: { $in: ids } });
+            expect(mockBookModel.find).toHaveBeenCalledTimes(1)
+        })
+
+
+        it('should handle errors from the database', async () => {
+            const ids = ["validid"];
+            mockBookModel.find.mockImplementation(() => {
+                throw new Error('Database error');
+            });
+            await expect(repo.getBooksByIds(ids)).rejects.toThrow('Database error');
+            expect(mockBookModel.find).toHaveBeenCalledWith({ _id: { $in: ids } });
+        })
+
+
+    })
 });

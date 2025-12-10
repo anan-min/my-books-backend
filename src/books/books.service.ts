@@ -18,4 +18,15 @@ export class BooksService {
         return stock >= quantity;
     }
     
+    async getBooksByIds(ids: string[]): Promise<BookData[]> {
+        if(ids.length === 0){
+            return [] 
+        }
+        try {
+            return this.bookRepository.getBooksByIds(ids);
+        } catch (error) {
+            throw (error);
+        }
+
+    }
 }
