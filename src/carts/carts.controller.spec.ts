@@ -1,39 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CartsController } from './carts.controller';
 import { CartsService } from './carts.service';
-import { AddItemInputDto } from './cart.dto';
+import { AddItemInputDto, CartMeta } from './cart.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { Cart } from './carts.repository';
-
-        // Logic to add item to cart
-
-        // ( scenario 1 )
-        // no cartid (null)
-        // always enough item in stock 
-
-
-            // (cart service test cases )
-            // test cases 
-            // (1) normal flow 
-            // should create a new cart and add the item, return the new cart id
-            // should call enoughStock(1) getCart(1) createCart(1)
-            // should call enoughStock getCart createCart with correct arguments
-        
-        
-            // (2) error flow 
-            // 2.1 should handle errors from repository when creating cart
-            // 2.2 should handle erros from service when checking bookstock
-            // 2.3 should handle errors from repository when get cart
-
-
-        // test case I can think of 
-        // should set cartId to null if not send from user 
-        // shouldcall cart service add item. 
-        // should return result from cart service add item and convert it to output item dto 
-        // should validate bookId and quatity 
-        
-
-
+import { GetCartOutputDto, GetCartInputDto, GetCartFromCheckoutDto, CheckoutMeta } from './cart.dto';
+import { BadRequestException } from '@nestjs/common';
 
 
   describe('CartsController', () => {
@@ -43,7 +15,9 @@ import { Cart } from './carts.repository';
     beforeEach(async () => {
 
       mockCartService = {
-        addItem: jest.fn()
+        addItem: jest.fn(),
+        getCart: jest.fn(),
+        generateCheckoutRenderData: jest.fn()
       }
       const module: TestingModule = await Test.createTestingModule({
         controllers: [CartsController],
@@ -105,7 +79,6 @@ import { Cart } from './carts.repository';
             }
           ]
         }
-        
   
         mockCartService.addItem = jest.fn().mockResolvedValue({cartId, cart})
         const result = await controller.addItemToCart(input);
@@ -119,5 +92,100 @@ import { Cart } from './carts.repository';
     });
 
 
+
+    // should check cartId if 
+    describe('getCart', () => {
+      it('should return cartId cart and metadata for render', async () => {
+        // should return cartId cart and meta data for render 
+        // should handle error from service error 
+
+        const cartId = "validCartId"
+        const cart: Cart = {
+          items: [
+            {
+              _id: "book-id-1",
+              qty: 1
+            }
+          ]
+        }
+        const meta: CartMeta = {
+          totalItems: 1, 
+          totalPrice: 20,
+          messages: [] 
+        }
+
+        const renderData = [
+          {
+            bookId: "book-id-1",
+            bookTitle: "Some Book",
+            bookPrice: 20,
+            bookQty: 1
+          }
+        ]
+
+        mockCartService.getCart = jest.fn().mockResolvedValue({cartId, cart, renderData, meta})
+        const result = await controller.getCart(cartId);
+        expect(result).toEqual({cartId, cart, renderData, meta})
+      })
+
+      it('should handle errorn when service error occurs', async () => {
+        const cartId = "validCartId"
+        mockCartService.getCart = jest.fn().mockRejectedValue(new Error("cart service error etc"))
+        await expect(controller.getCart(cartId)).rejects.toThrow(new Error("Server Error"))
+      })
+  
+      it('should throw error if cartid is null', async () => { 
+        const cartId = ""
+        mockCartService.getCart = jest.fn() 
+        await expect(controller.getCart(cartId)).rejects.toThrow(new BadRequestException("Cart ID is required"))
+      })
+
+    })
+
+
+    describe('getCartFromCheckout', () => {
+      // should return error if cartId is empty 
+      // should generate proper checkout information 
+      // should handle error from service and return as server error 
+
+      it('should return error if catId is empty', async () => {
+        const cartId = ""
+        mockCartService.generateCheckoutRenderData = jest.fn() 
+        await expect(controller.getCheckoutSummary(cartId)).rejects.toThrow(new BadRequestException("Cart ID is required"))
+        expect(mockCartService.generateCheckoutRenderData).not.toHaveBeenCalled()
+      });
+
+      it('should generate proper checkout information', async () => {
+
+        const cartId = "cartId"
+
+
+        const serviceResult: CheckoutMeta = {
+          totalItems: 1, 
+          totalPrice: 50.12,
+          shippingCost: 100,
+          grandTotal: 150.12
+        }
+
+        const expectedOutput: GetCartFromCheckoutDto = {
+          totalItems: 1, 
+          totalPrice: 50.12,
+          shippingCost: 100,
+          grandTotal: 150.12
+        }
+
+        mockCartService.generateCheckoutRenderData = jest.fn().mockResolvedValue(serviceResult);
+        const result = await controller.getCheckoutSummary(cartId);
+        expect(result).toEqual(expectedOutput);
+
+      });
+
+      it('should handle error from service and return as server error', async () => {
+        const cartId = "cartId"
+        mockCartService.generateCheckoutRenderData = jest.fn().mockRejectedValue(new Error("some service error"));
+        await expect( controller.getCheckoutSummary(cartId) ).rejects.toThrow(new Error("Server Error"))
+      });
+      
+    })
     
   });

@@ -4,15 +4,10 @@ import { CartsRepository } from './carts.repository';
 import { BooksService } from '../books/books.service';
 import { v4 as uuidv4 } from 'uuid';
 import { BookData } from 'src/books/Book.schema';
+import { CartMeta, CheckoutMeta, SHIPPING_COST } from './cart.dto';
+import { CartItemRenderData } from './cart.dto';
 
-const SHIPPING_COST = 100;
-export interface CartMeta {
-    total_items: number;
-    total_price: number;
-    shipping_cost: number
-    grand_total: number;
-    messages: string[];
-}
+
 
 @Injectable()
 export class CartsService {
@@ -20,7 +15,7 @@ export class CartsService {
     {}
 
 
-    async addItem(bookId: string, quantity: number, cartId: string | null): Promise<{ cartId: string; cart: Cart } | undefined> {
+    public async addItem(bookId: string, quantity: number, cartId: string | null): Promise<{ cartId: string; cart: Cart } | undefined> {
         const hasEnoughStock = await this.bookService.hasEnoughStock(bookId, quantity);
         if(hasEnoughStock) {
             const IsCartExists = await this.cartRepository.getCart(cartId)
@@ -37,7 +32,7 @@ export class CartsService {
     }
 
 
-    async getCart(cartId: string): Promise<{ cartId: string; cart: Cart; meta: CartMeta } | undefined> {
+    public async getCart(cartId: string): Promise<{ cartId: string; cart: Cart; cartRender: CartItemRenderData[]; meta: CartMeta } | undefined> {
 
         // get cart 
         try {
@@ -47,17 +42,19 @@ export class CartsService {
                 const books: BookData[] = await this.bookService.getBooksByIds( bookIDs ) || [];
                 const bookMap = this.buildBookMap(books);
     
-                const { removed, updated } = this.filterCartItems(cart, bookMap);
+                const { removed, reduced, updated } = this.filterCartItems(cart, bookMap);
     
                 const updatedCart: Cart = {
                     items: updated
                 }
-    
-                const metaData = this.calculateCartMeta(updatedCart.items, bookMap);
+
+                const cartRender: CartItemRenderData[] = this.generateCartRenderData(updatedCart.items, bookMap);
+                const metaData: CartMeta = this.calculateCartMeta(updatedCart.items, bookMap);
     
                 return {
                     cartId,
                     cart: updatedCart,
+                    cartRender: cartRender,
                     meta: metaData,
                 }
                
@@ -65,6 +62,39 @@ export class CartsService {
         } catch (error) {
             throw error;
         }
+    }
+
+    public async generateCheckoutRenderData(cartId: string): Promise<CheckoutMeta | undefined> {
+        const cart = await this.cartRepository.getCart(cartId);
+        if( cart ) {
+            const itemsIds = cart.items.map( (item) => item._id );
+            const books = await this.bookService.getBooksByIds(itemsIds);
+            const booksMap = this.buildBookMap(books);
+            return this.calculateCheckoutData(cart, booksMap)
+        }
+        // fetch cart from redis 
+        // cart exists -> render checkout data 
+        // no exists return null / throw error to redirect to cart page
+    }
+
+
+    private  calculateCheckoutData(cart: Cart, booksMap: Map<string, BookData>): CheckoutMeta {
+        const items = cart.items
+        const matchedItems = items.filter( item => booksMap.has(item._id) );
+        const totalItems = matchedItems.reduce( (sum, item) => sum + item.qty, 0);
+        const totalPrice = matchedItems.reduce( (sum, item) => {
+            const book = booksMap.get(item._id);
+            return sum + (book ? book.price * item.qty : 0);
+        }, 0);
+        const shippingCost = SHIPPING_COST; 
+        const grandTotal = totalPrice + shippingCost;
+        const result: CheckoutMeta = {
+            totalItems,
+            totalPrice,
+            shippingCost,
+            grandTotal,
+        };
+        return result;
     }
 
    
@@ -75,7 +105,9 @@ export class CartsService {
 
     private filterCartItems(cart: Cart, bookMap: Map<string, BookData>) {
         const removed: { _id: string, reason: string }[] = [];
+        const reduced: { _id: string, oldQty: number, newQty: number, reason: string}[] = [];
         const updated: CartItem[] = [];
+        
         for (const item of cart.items) {
             const book = bookMap.get(item._id);
             if (!book) {
@@ -84,11 +116,9 @@ export class CartsService {
                 updated.push(item);
             }
         }
-        return { removed, updated };
+        return { removed, reduced, updated };
     }
 
-
-    
 
     private calculateCartMeta(cartItem: CartItem[], bookMap: Map<string, BookData>): CartMeta {
         const total_price = cartItem.reduce( (sum, item) => {
@@ -96,16 +126,27 @@ export class CartsService {
             return sum + (book ? book.price * item.qty : 0);
         }, 0);
         const itemCount = cartItem.reduce( (sum, item) => sum + item.qty, 0);
-        const shipping_cost = total_price > 0 ? SHIPPING_COST : 0;
-        const grand_total = total_price + shipping_cost;
-
         const metaData: CartMeta = {
-            total_items: itemCount,
-            total_price: total_price,
-            shipping_cost: shipping_cost,
-            grand_total: grand_total,
+            totalItems: itemCount,
+            totalPrice: total_price,
             messages: []
         };
         return metaData;
     }
+
+    private generateCartRenderData(cartItems: CartItem[], bookMap: Map<string, BookData>): CartItemRenderData[] {
+        const renderData: CartItemRenderData[] = cartItems.map( item => {
+            const book = bookMap.get(item._id);
+            return {
+                bookId: item._id,
+                bookTitle: book ? book.title : "Unknown",
+                bookPrice: book ? book.price : 0,
+                bookQty: item.qty
+            }
+        });
+        return renderData;
+    }
+
+
+
 }

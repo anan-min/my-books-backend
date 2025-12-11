@@ -52,7 +52,7 @@ export class BookRepository {
             const books = await this.bookModel.find({
                 _id: { $in: ids }
             }).lean().exec();
-            return books.map(book => this.bookToBookData(book._id));
+            return books.map(book => this.bookToBookData(book));
         } catch (error) {
             throw error;
         }

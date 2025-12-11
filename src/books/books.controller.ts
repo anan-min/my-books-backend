@@ -9,7 +9,6 @@ import { BookData } from './Book.schema';
 export class BooksController {
     constructor (private readonly bookService: BooksService) {}
     
-
     @Get() 
     async getDefaultBooks() {
         const books: BookData[] = await this.bookService.getDefaultBooks();

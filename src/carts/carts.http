@@ -1,4 +1,8 @@
 
+
+
+@cartId = "710be34c-0658-4a33-adcb-f08dbc26d7ec"
+
 ### Add item to cart 
 POST http://localhost:3000/carts/add
 Content-Type: application/json
@@ -7,3 +11,13 @@ Content-Type: application/json
   "bookId": "693691f884f2437364f43f5c",
   "quantity": 1
 }
+
+### Get cart
+PATCH http://localhost:3000/carts/262d291d-8ec0-4e4f-b860-b99da361b027
+
+
+
+### Get checkout data for cart
+GET http://localhost:3000/carts/82dbefac-3bf2-4d57-b6a2-f56fdbe2809f
+
+
