@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksService } from './books.service';
 import { BookRepository } from './books.repository';
-import { BookData } from './Book.schema';
-import { mock } from 'node:test';
+import { Types } from 'mongoose';
 
 describe('BooksService', () => {
   let service: BooksService;
@@ -27,13 +26,13 @@ describe('BooksService', () => {
   });
 
 
-  function mockBooksFromRepo(count: number): BookData[] {
-    let books: BookData[] = [];
+  function mockBooksFromRepo(count: number): any[] {
+    let books: any[] = [];
     for (let i = 0; i < count; i++) {
       books.push({
-        _id: `book-id-${i}`,
-        title: `Book Title ${i}`,
-        genre: ['Fiction', 'Adventure'],
+        _id: new Types.ObjectId(),
+        title: `Book Title ${i + 1}`, 
+        genre: `Genre ${i + 1}`,
         price: 10 + i,
         stock: 5 + i,
         createdAt: new Date(),

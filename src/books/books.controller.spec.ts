@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksController } from './books.controller';
 import { BooksService } from './books.service';
-import { BookData } from './Book.schema';
+import { Types } from 'mongoose';
 
 describe('BooksController', () => {
   let controller: BooksController;
   let mockService: Partial<BooksService>;
 
 
-  function mockDataFromService(count: number): BookData[] {
-    let books: BookData[] = [];
+  function mockDataFromService(count: number) {
+    let books: any[] = [];
     for (let i = 0; i < count; i++) {
       books.push({
-        _id: `book-id-${i}`,
+        _id: new Types.ObjectId(),
         title: `Book Title ${i}`,
         genre: ['Fiction', 'Adventure'],
         price: 10 + i,

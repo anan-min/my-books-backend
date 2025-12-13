@@ -90,20 +90,11 @@ describe('BookRepository', () => {
                     updatedAt: new Date(),
                 },
             ];
-
-            const expectedResult = books.map(book => ({
-                _id: book._id.toString(),
-                title: book.title,
-                genre: book.genre,
-                price: book.price,
-                stock: book.stock,
-                createdAt: book.createdAt,
-                updatedAt: book.updatedAt,
-            }))
+            
 
             mockBookModel.find.mockReturnValue(mockFindChain(books))
             const result = await repo.findDefaultBooks();
-            expect(result).toEqual(expectedResult);
+            expect(result).toEqual(books);
         })
 
         it('should handle error if mongo have error', async () => {
