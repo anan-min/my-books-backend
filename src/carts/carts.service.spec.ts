@@ -3,8 +3,8 @@ import { CartsService } from './carts.service';
 import { BooksService } from '../books/books.service';
 import { Cart } from './cart.interface';
 import { CartsRepository } from './carts.repository';
-import { BookData } from '../books/books.interface';
-import { CartItemDisplay, CheckoutSummary, SHIPPING_COST } from './cart.dto';
+import { CartItemDisplay, CheckoutSummary, SHIPPING_COST } from './cart.interface';
+
 describe('CartsService', () => {
   let service: CartsService;
   let mockCartRepo: Partial<CartsRepository>;
@@ -163,7 +163,7 @@ describe('CartsService', () => {
           }
         ]
       };
-      const books: BookData[] = [
+      const books: any[] = [
 
       ] 
       mockCartRepo.getCart = jest.fn().mockResolvedValue(cart);
@@ -189,7 +189,7 @@ describe('CartsService', () => {
           }
         ]
       };
-      const books: BookData[] = [
+      const books: any[] = [
         {
           _id: bookIDs[0],
           title: "title",
@@ -235,7 +235,7 @@ describe('CartsService', () => {
         ]
       }
 
-      const books: BookData[] = [
+      const books: any[] = [
         {
           _id: includeId,
           title: "title",
@@ -276,7 +276,7 @@ describe('CartsService', () => {
           }
         ]
       };
-      const books: BookData[] = [
+      const books: any[] = [
         {
           _id: bookIDs[0],
           title: "title",
@@ -323,7 +323,7 @@ describe('CartsService', () => {
           }
         ]
       };
-      const books: BookData[] = [
+      const books: any[] = [
         {
           _id: bookIDs[0],
           title: "title",
@@ -384,7 +384,7 @@ describe('CartsService', () => {
           }
         ]
       };
-      const books: BookData[] = [
+      const books: any[] = [
         {
           _id: bookIDs[0],
           title: "title",
@@ -464,7 +464,7 @@ describe('CartsService', () => {
         ]
       }
 
-      const books: BookData[] = [
+      const books: any[] = [
         {
           _id: "book1",
           title: "Book One",
@@ -499,7 +499,7 @@ describe('CartsService', () => {
           { _id: itemIds[1], qty: 4 },
         ]
       }
-      const books: BookData[] = [
+      const books: any[] = [
         {
           _id: itemIds[0],
           title: "Book One",
@@ -549,7 +549,7 @@ describe('CartsService', () => {
         ]
       }
 
-      const books: BookData[] = [
+      const books: any[] = [
         {
           _id: itemIds[0],
           title: "Book One",
@@ -584,9 +584,7 @@ describe('CartsService', () => {
       expect(mockCartRepo.getCart).toHaveBeenCalledTimes(1)
       expect(mockBooksService.getBooksByIds).toHaveBeenCalledTimes(1)
 
-
       expect(result).toEqual(expectedCheckout);
-      
     })
 
 

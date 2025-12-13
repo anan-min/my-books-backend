@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksController } from './books.controller';
 import { BooksService } from './books.service';
-import { Types } from 'mongoose';
+import { plainToInstance } from 'class-transformer';
+import { BookOutputDto } from './dtos/book-output.dto';
 
 describe('BooksController', () => {
   let controller: BooksController;
@@ -12,7 +13,7 @@ describe('BooksController', () => {
     let books: any[] = [];
     for (let i = 0; i < count; i++) {
       books.push({
-        _id: new Types.ObjectId(),
+        _id: `new ObjectId(${i})`,
         title: `Book Title ${i}`,
         genre: ['Fiction', 'Adventure'],
         price: 10 + i,
@@ -58,13 +59,9 @@ describe('BooksController', () => {
     mockService.getDefaultBooks = jest.fn().mockResolvedValue(mockBooks);
     const result = await controller.getDefaultBooks();
 
-    const expectedResult = mockBooks.map(book => ({
-      _id: book._id,
-      title: book.title,
-      genre: book.genre,
-      price: book.price,
-      stock: book.stock,
-    }));
+    const expectedResult = mockBooks.map((book: any) =>
+        plainToInstance(BookOutputDto, book, { excludeExtraneousValues: true })
+    );
 
     expect(result).toEqual(expectedResult);
   });
@@ -85,9 +82,6 @@ describe('BooksController', () => {
   });
 
   
-
-
-
 
 
 });

@@ -19,7 +19,7 @@ export class CartsController {
     // @UsePipes(new ValidationPipe({ transform: true }))
     async addItemToCart(
         @Body() body: AddItemRequestDto
-    ) {
+    ): Promise<AddItemResponseDto> {
         const cartId = body.cartId ? body.cartId : null;
         const result = await this.cartsService.addItem(body.bookId, body.quantity, cartId);
         return plainToInstance(AddItemResponseDto, result);
@@ -27,7 +27,7 @@ export class CartsController {
 
 
     @Patch(':cartId')
-    async getCart(@Param('cartId') cartId: string) { 
+    async getCart(@Param('cartId') cartId: string): Promise<GetCartResponseDto> { 
         if (!cartId) {
             throw new BadRequestException("Cart ID is required");
         }
@@ -40,7 +40,7 @@ export class CartsController {
     }
 
     @Get(':cartId')
-    async getCheckoutSummary(@Param('cartId') cartId: string) { 
+    async getCheckoutSummary(@Param('cartId') cartId: string): Promise<CheckoutSummaryDto> { 
         // return checkout render data
         if (!cartId) {
             throw new BadRequestException("Cart ID is required")

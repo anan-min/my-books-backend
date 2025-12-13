@@ -3,9 +3,8 @@ import { Cart, CartItem } from './cart.interface';
 import { CartsRepository } from './carts.repository';
 import { BooksService } from '../books/books.service';
 import { v4 as uuidv4 } from 'uuid';
-import { BookData } from '../books/books.interface';
-import { CartSummary, CheckoutSummary, SHIPPING_COST } from './cart.dto';
-import { CartItemDisplay } from './cart.dto';
+import { CartSummary, CheckoutSummary, SHIPPING_COST, CartItemDisplay } from './cart.interface';
+import { BookDocument } from 'src/books/schemas/Book.schema';
 
 
 
@@ -42,7 +41,7 @@ export class CartsService {
             if( cart ) {
                 // fetch books
                 const bookIDs = cart.items.map( (item) => item._id );
-                const books: BookData[] = await this.bookService.getBooksByIds( bookIDs ) || [];
+                const books = await this.bookService.getBooksByIds( bookIDs ) || [];
                 const bookMap = this.buildBookMap(books);
     
                 // update item cin carts  
@@ -78,7 +77,7 @@ export class CartsService {
     }
 
 
-    private  calculateCheckoutData(cart: Cart, booksMap: Map<string, BookData>): CheckoutSummary {
+    private  calculateCheckoutData(cart: Cart, booksMap: Map<string, BookDocument>): CheckoutSummary {
         const items = cart.items
         const matchedItems = items.filter( item => booksMap.has(item._id) );
         const totalItems = matchedItems.reduce( (sum, item) => sum + item.qty, 0);
@@ -99,13 +98,13 @@ export class CartsService {
     }
 
    
-    private buildBookMap(books: BookData[]): Map<string, BookData> {
-        return new Map(books.map(b => [b._id, b]));
+    private buildBookMap(books: BookDocument[]): Map<string, BookDocument> {
+        return new Map(books.map(b => [b._id.toString(), b]));
     }
 
 
     // return updated cart would be better tho 
-    private filterCartItems(cart: Cart, bookMap: Map<string, BookData>) {
+    private filterCartItems(cart: Cart, bookMap: Map<string, BookDocument>) {
         const removed: { _id: string, reason: string }[] = [];
         const reduced: { _id: string, oldQty: number, newQty: number, reason: string}[] = [];
         const updatedItems: CartItem[] = [];
@@ -125,7 +124,7 @@ export class CartsService {
     }
 
 
-    private calculateCartSummary(cartItem: CartItem[], bookMap: Map<string, BookData>): CartSummary {
+    private calculateCartSummary(cartItem: CartItem[], bookMap: Map<string, BookDocument>): CartSummary {
         const total_price = cartItem.reduce( (sum, item) => {
             const book = bookMap.get(item._id);
             return sum + (book ? book.price * item.qty : 0);
@@ -139,7 +138,7 @@ export class CartsService {
         return cartSummary;
     }
 
-    private generateCartDisplay(cartItems: CartItem[], bookMap: Map<string, BookData>): CartItemDisplay[] {
+    private generateCartDisplay(cartItems: CartItem[], bookMap: Map<string, BookDocument>): CartItemDisplay[] {
         const renderData: CartItemDisplay[] = cartItems.map( item => {
             const book = bookMap.get(item._id);
             return {

@@ -1,6 +1,6 @@
 
 import { Exclude, Expose } from 'class-transformer';
-import { IsString, IsDate, Max, Min, IsArray } from 'class-validator';
+import { IsString, IsDate, Min, IsArray, IsNumber } from 'class-validator';
 
 
 export class BookOutputDto {
@@ -13,12 +13,12 @@ export class BookOutputDto {
     title: string; 
 
     @Expose()
-    @IsString()
+    @IsNumber()
     @Min(0)
     price: number; 
 
     @Expose()
-    @IsString()
+    @IsNumber()
     @Min(0)
     stock: number; 
 
