@@ -4,7 +4,7 @@ import { Document, HydratedDocument } from "mongoose";
 export type BookDocument = HydratedDocument<Book>;
 
 @Schema({timestamps: true})
-export class Book extends Document {
+export class Book {
   @Prop({ required: true })
   title: string;
 

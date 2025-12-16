@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CartsService } from './carts.service';
 import { BooksService } from '../books/books.service';
-import { Cart } from './cart.interface';
+import { Cart } from './interfaces/cart.interface';
 import { CartsRepository } from './carts.repository';
-import { CartItemDisplay, CheckoutSummary } from './cart.interface';
+import { CartItemDisplay, CheckoutSummary } from './interfaces/cart.interface';
 import { SHIPPING_COST } from '../common/constants';
 
 describe('CartsService', () => {

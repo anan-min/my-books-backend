@@ -2,9 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { BadRequestException } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
-import { CreateOrderResponseDto } from './dtos/create-order.dto';
-
+import { Types } from 'mongoose';
 describe('OrdersController', () => {
   let controller: OrdersController;
   let mockService: Partial<OrdersService>;
@@ -62,7 +60,8 @@ describe('OrdersController', () => {
     const validCartId = "validCartId123";
     const validAddress = "123 Main St, Springfield, USA";
 
-    const mockOrderPlain = {
+    const mockOrder = {
+      _id: new Types.ObjectId(),
       items: [
         { _id: 'book1', title: 'Book One', price: 10, qty: 2 },
         { _id: 'book2', title: 'Book Two', price: 15, qty: 1 },
@@ -73,22 +72,20 @@ describe('OrdersController', () => {
       paymentSessionId: '',
     };
 
-    const mockOrderResponse = {
-      toObject: jest.fn(() => mockOrderPlain),
-    }
 
-
-    const expectedResult = {
+    const expectedResponse ={
       orderId: expect.any(String),
-      items: mockOrderPlain.items,
-      totalPrice: mockOrderPlain.totalPrice,
-      shippingAddress: mockOrderPlain.shippingAddress,
-      status: mockOrderPlain.status,
-      paymentSessionId: mockOrderPlain.paymentSessionId,
+      items: mockOrder.items,
+      totalPrice: mockOrder.totalPrice,
+      shippingAddress: mockOrder.shippingAddress,
+      status: mockOrder.status,
+      paymentSessionId: mockOrder.paymentSessionId,
     }
 
-    mockService.createOrder = jest.fn().mockResolvedValue(mockOrderResponse);
-    const result = await controller.createOrder({cartId: validCartId, shippingAddress: validAddress});
-    expect(result).toEqual(expectedResult);
+
+   
+    mockService.createOrder = jest.fn().mockResolvedValue(mockOrder);
+    const actual = await controller.createOrder({cartId: validCartId, shippingAddress: validAddress});
+    expect(actual).toEqual(expectedResponse);
   });
 });

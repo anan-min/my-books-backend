@@ -20,35 +20,3 @@ export interface Item  {
 }
 
 
-export class CreateOrderResponseDto {
-    @Expose()
-    @IsString()
-    orderId: string;
-
-    @Expose()
-    items: Item[];
-
-    @Expose()
-    @IsNumber()
-    totalPrice: number;
-
-    @Expose()
-    @IsString()
-    shippingAddress: string;
-
-    @Expose()
-    @IsString()
-    status: string;
-
-    @Expose()
-    @IsString()
-    paymentSessionId: string;
-
-    @Exclude()
-    @IsDate()
-    createdAt: Date;
-
-    @Exclude()
-    @IsDate()
-    updatedAt: Date;
-}

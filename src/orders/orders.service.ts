@@ -3,6 +3,7 @@ import { OrdersRepository } from './orders.repository';
 import { CartsService } from '../carts/carts.service'
 import { BooksService } from '../books/books.service';
 import { SHIPPING_COST } from '../common/constants';
+import { Order, OrderDocument } from './schemas/Order.schema';
 
 @Injectable()
 export class OrdersService {
@@ -12,7 +13,7 @@ export class OrdersService {
         private readonly orderRepository: OrdersRepository
     ) {}
 
-    async createOrder(cartId: string, shippingAddress: string) {
+    async createOrder(cartId: string, shippingAddress: string): Promise<Order | undefined> {
         // fetch cart from redis 
         const cart =  await this.cartsService.getCartForOrder(cartId);
         // should cart error called from cart service ?
@@ -25,6 +26,7 @@ export class OrdersService {
         
         // create item from books 
         const bookMap = this.buildBookMap( books || [] );
+        
         const orderItems = this.createOrderItemsFromCart( cart, bookMap );
         const totalPrice = this.calculateTotalPrice( orderItems );
 

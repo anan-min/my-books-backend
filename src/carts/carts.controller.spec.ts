@@ -3,7 +3,7 @@ import { CartsController } from './carts.controller';
 import { CartsService } from './carts.service';
 import { BadRequestException } from '@nestjs/common';
 import { AddItemRequestDto } from './dtos/add-item.dto';
-import { Cart, CartSummary, CheckoutSummary } from './cart.interface';
+import { Cart, CartSummary, CheckoutSummary } from './interfaces/cart.interface';
 import { CheckoutSummaryDto } from './dtos/checkout-summary.dto';
 import { GetCartResponseDto } from './dtos/get-cart.dto';
 import e from 'express';

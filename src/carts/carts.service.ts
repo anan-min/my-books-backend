@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Cart, CartItem } from './cart.interface';
+import { Cart, CartItem } from './interfaces/cart.interface';
 import { CartsRepository } from './carts.repository';
 import { BooksService } from '../books/books.service';
 import { v4 as uuidv4 } from 'uuid';
-import { CartSummary, CheckoutSummary, CartItemDisplay } from './cart.interface';
+import { CartSummary, CheckoutSummary, CartItemDisplay } from './interfaces/cart.interface';
 import { BookDocument } from '../books/schemas/Book.schema';
 import { SHIPPING_COST } from '../common/constants';
 

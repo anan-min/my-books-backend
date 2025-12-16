@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from '../redis/redis.service';
-import { CartItem, Cart } from './cart.interface';
+import { CartItem, Cart } from './interfaces/cart.interface';
 
 
 @Injectable()

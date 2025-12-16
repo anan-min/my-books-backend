@@ -1,12 +1,12 @@
 
 import { Exclude, Expose } from 'class-transformer';
 import { IsString, IsDate, Min, IsArray, IsNumber } from 'class-validator';
+import { Types } from 'mongoose';
 
 
 export class BookOutputDto {
     @Expose()
-    @IsString()
-    _id: string;
+    _id: Types.ObjectId;
 
     @Expose()
     @IsString()

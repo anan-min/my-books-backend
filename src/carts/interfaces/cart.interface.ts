@@ -31,3 +31,25 @@ export interface CartItemDisplay {
   bookPrice: number; 
   bookQty: number; 
 }
+
+
+
+export interface AddItemResponse {
+  cartId: string;
+  cart: Cart;
+}
+
+
+export interface GetCartResponse {
+  cartId: string; 
+  cartDisplay : CartItemDisplay[];
+  cart: Cart;
+  cartSummary: CartSummary;
+}
+
+export interface CheckoutSummaryResponse {
+  totalItems: number;
+  totalPrice: number;
+  shippingCost: number;
+  grandTotal: number;
+}

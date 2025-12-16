@@ -12,6 +12,15 @@ Content-Type: application/json
   "quantity": 1
 }
 
+### Add item to cart  2
+POST http://localhost:3000/carts/add
+Content-Type: application/json
+
+{
+  "bookId": "693691f884f2437364f43f5c",
+  "quantity": 1
+}
+
 ### Get cart
 PATCH http://localhost:3000/carts/262d291d-8ec0-4e4f-b860-b99da361b027
 

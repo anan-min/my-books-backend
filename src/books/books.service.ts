@@ -7,7 +7,7 @@ export class BooksService {
     constructor(private readonly bookRepository: BookRepository) {}
  
     async getDefaultBooks(): Promise<BookDocument[] | []> {
-        return (await this.bookRepository.findDefaultBooks()).slice(0, 20);
+        return (await this.bookRepository.findDefaultBooks());
     }
     
     async hasEnoughStock(id: string, quantity: number): Promise<boolean> {

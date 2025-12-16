@@ -12,6 +12,7 @@ import { RedisModule } from './redis/redis.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
 import { OrdersController } from './orders/orders.controller';
+import { PaymentsModule } from './payments/payments.module';
 dotenv.config(); 
 
 
@@ -21,7 +22,7 @@ dotenv.config();
               CartsModule, 
               OrdersModule, 
               RedisModule, 
-              MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://localhost/nest')
+              MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://localhost/nest'), PaymentsModule
             ],
   controllers: [AppController, CartsController, BooksController, OrdersController],
   providers: [AppService, BooksService, OrdersService, OrdersService],
