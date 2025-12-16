@@ -13,6 +13,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
 import { OrdersController } from './orders/orders.controller';
 import { PaymentsModule } from './payments/payments.module';
+import { PaymentsController } from './payments/payments.controller';
+import { PaymentsService } from './payments/payments.service';
+import { PaymentGatewayModule } from './gateway/payment-gateway.module';
 dotenv.config(); 
 
 
@@ -22,10 +25,12 @@ dotenv.config();
               CartsModule, 
               OrdersModule, 
               RedisModule, 
-              MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://localhost/nest'), PaymentsModule
+              PaymentsModule,
+              PaymentGatewayModule,
+              MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://localhost/nest')
             ],
-  controllers: [AppController, CartsController, BooksController, OrdersController],
-  providers: [AppService, BooksService, OrdersService, OrdersService],
+  controllers: [AppController, CartsController, BooksController, OrdersController, PaymentsController],
+  providers: [AppService, BooksService, OrdersService, OrdersService, PaymentsService],
 })
 export class AppModule {
 

@@ -1,0 +1,21 @@
+### create session 
+POST http://localhost:3000/payments/session
+Content-Type: application/json
+
+{
+  "amount": 1000,
+  "currency": "THB",
+  "orderId": "order_12345"
+}
+
+
+
+
+### process payment 
+POST http://localhost:3000/payments/process
+Content-Type: application/json
+
+{
+    "sessionId": "cs_test_6b282904-58a7-44f3-9111-c763ab97d287",
+    "success": true
+}

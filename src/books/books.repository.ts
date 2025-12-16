@@ -19,10 +19,12 @@ export class BookRepository {
 
     async getBookStock(id: string): Promise<number | null> {
         // projection 
-        const book = await this.bookModel.findById(id).exec();
+        const book = await this.bookModel.findById(id, { stock: 1 }).exec();
+
         if (!book) {
             return null;
         }
+        
         return book.stock;
     }
 
@@ -33,7 +35,7 @@ export class BookRepository {
 
         try {
             return await this.bookModel.find({
-                _id: { $in: ids }
+                _id: { $in: ids },
             }).exec();
             
         } catch (error) {
@@ -42,16 +44,4 @@ export class BookRepository {
 
     }
 
-    
-    // private bookToBookData(book: BookDocument): BookData {
-    //     return {
-    //         _id: book._id.toString(),
-    //         title: book.title,
-    //         genre: book.genre,
-    //         price: book.price,
-    //         stock: book.stock,
-    //         createdAt: book.createdAt,
-    //         updatedAt: book.updatedAt,
-    //     };
-    // }
 }
