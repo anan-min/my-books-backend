@@ -171,13 +171,6 @@ describe('BooksService', () => {
       expect(service.getBooksByIds).toBeDefined();
     });
 
-    it('should return empty array when no ids provided', async () => {
-      mockRepo.getBooksByIds = jest.fn();
-      const result = await service.getBooksByIds([]);
-      expect(result).toEqual([]);
-      expect(mockRepo.getBooksByIds).not.toHaveBeenCalled();
-    });
-
     it('should return books with correct structure for given ids', async () => {
       const books = mockBooksFromRepo(10);
       const bookIds = books.map((book) => book._id);

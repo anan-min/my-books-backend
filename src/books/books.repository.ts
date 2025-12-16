@@ -18,6 +18,7 @@ export class BookRepository {
 
 
     async getBookStock(id: string): Promise<number | null> {
+        // projection 
         const book = await this.bookModel.findById(id).exec();
         if (!book) {
             return null;

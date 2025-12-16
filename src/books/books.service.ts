@@ -19,9 +19,6 @@ export class BooksService {
     }
     
     async getBooksByIds(ids: string[]): Promise<BookDocument[]> {
-        if(ids.length === 0){
-            return [] 
-        }
         try {
             return this.bookRepository.getBooksByIds(ids);
         } catch (error) {
