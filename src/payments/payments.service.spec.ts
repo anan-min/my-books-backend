@@ -61,7 +61,7 @@ describe('PaymentsService', () => {
 
     it('should return session id from payment gateway', async () => {
       mockPaymentGateway.createPaymentSession = jest.fn().mockResolvedValue('test_session_id_123');
-      const actual = await service.createPaymentSession(1000, 'USD', 'order123');
+      const actual = await service.createPaymentSession(1000, 'USD', 'cart12345142');
       expect(actual).toEqual('test_session_id_123');
     });
 
@@ -69,7 +69,7 @@ describe('PaymentsService', () => {
       mockPaymentGateway.createPaymentSession = jest.fn().mockImplementation(() => {
         throw new InternalServerErrorException("Failed to create payment session");
       });
-      await expect(service.createPaymentSession(1000, 'USD', 'order123')).rejects.toThrow(InternalServerErrorException);
+      await expect(service.createPaymentSession(1000, 'USD', 'cart12345142')).rejects.toThrow(InternalServerErrorException);
     });
   });
 

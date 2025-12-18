@@ -10,7 +10,7 @@ export class PaymentsService {
         return this.paymentGateway.processPayments(sessionId, success);
     }
 
-    async createPaymentSession(amount: number, currency: string, orderId: string): Promise<string> {
-        return this.paymentGateway.createPaymentSession(amount, currency, orderId);
+    async createPaymentSession(amount: number, currency: string, cartId: string): Promise<string> {
+        return this.paymentGateway.createPaymentSession(amount, currency, cartId);
     }
 }

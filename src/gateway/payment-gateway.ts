@@ -8,13 +8,13 @@ import { ProcessPaymentData } from './payment-gateway.interface';
 export class PaymentGateway { 
     constructor(private readonly httpService: HttpService) {}
 
-    public async createPaymentSession(amount: number, currency: string, orderId: string): Promise<string> {
+    public async createPaymentSession(amount: number, currency: string, cartId: string): Promise<string> {
         try {
             const response = await firstValueFrom(
                 this.httpService.post('http://localhost:6969/payments/session', {
                     amount,
                     currency,
-                    orderId
+                    cartId
                 })
             );
 

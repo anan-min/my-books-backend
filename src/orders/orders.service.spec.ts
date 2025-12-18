@@ -3,7 +3,7 @@ import { OrdersService } from './orders.service';
 import { OrdersRepository } from './orders.repository';
 import { CartsService } from '../carts/carts.service';
 import { BooksService } from '../books/books.service';
-import { title } from 'process';
+import { PaymentsService } from '../payments/payments.service';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -11,6 +11,7 @@ describe('OrdersService', () => {
   let mockBookservice: Partial<BooksService>;
   let mockCartService: Partial<CartsService>;
   let mockOrderRepo: Partial<OrdersRepository>;
+  let mockPaymentsService: Partial<PaymentsService>;
 
 
   beforeEach(async () => {
@@ -22,6 +23,9 @@ describe('OrdersService', () => {
     }
     mockOrderRepo = {
       createOrder: jest.fn()
+    }
+    mockPaymentsService = {
+      createPaymentSession: jest.fn()
     }
 
 
@@ -40,6 +44,10 @@ describe('OrdersService', () => {
         {
           provide: BooksService,
           useValue: mockBookservice
+        },
+        {
+          provide: PaymentsService,
+          useValue: mockPaymentsService
         }
         
       ],
@@ -94,6 +102,7 @@ describe('OrdersService', () => {
     it('should fetch cart from redis', async () => {
       mockCartService.getCartForOrder = jest.fn().mockResolvedValue(mockCart);
       mockBookservice.getBooksByIds = jest.fn().mockResolvedValue(null);
+      mockPaymentsService.createPaymentSession = jest.fn().mockResolvedValue("someSessionId");
       mockOrderRepo.createOrder = jest.fn().mockResolvedValue(null);
 
       const cartId = "validCartId";
@@ -111,6 +120,7 @@ describe('OrdersService', () => {
     it('should fetch book from database with item in cart ', async () => {
       mockCartService.getCartForOrder = jest.fn().mockResolvedValue(mockCart);
       mockBookservice.getBooksByIds = jest.fn().mockResolvedValue(mockBooks);
+      mockPaymentsService.createPaymentSession = jest.fn().mockResolvedValue("someSessionId");
       const itemIds = mockCart.items.map( (item) => item._id );
       mockOrderRepo.createOrder = jest.fn().mockResolvedValue(null);
 
@@ -119,10 +129,25 @@ describe('OrdersService', () => {
       expect( mockBookservice.getBooksByIds ).toHaveBeenCalledWith(itemIds);
       expect( mockBookservice.getBooksByIds ).toHaveBeenCalledTimes(1);
     });
-  
-    it('should create order item item in cart / shipping address / total price',  async () => {
+
+
+    it('should use correct parameter to create session', async () => {
       mockCartService.getCartForOrder = jest.fn().mockResolvedValue(mockCart);
       mockBookservice.getBooksByIds = jest.fn().mockResolvedValue(mockBooks);
+      mockPaymentsService.createPaymentSession = jest.fn().mockResolvedValue("someSessionId");
+      const itemIds = mockCart.items.map( (item) => item._id );
+      mockOrderRepo.createOrder = jest.fn().mockResolvedValue(null);
+
+      const cartId = "validCartId";
+      await service.createOrder(cartId, "someShippingAddress");
+      expect( mockPaymentsService.createPaymentSession ).toHaveBeenCalledWith(132, 'USD', cartId);
+      expect( mockPaymentsService.createPaymentSession ).toHaveBeenCalledTimes(1);
+    });
+  
+    it('should create order with correct parameter',  async () => {
+      mockCartService.getCartForOrder = jest.fn().mockResolvedValue(mockCart);
+      mockBookservice.getBooksByIds = jest.fn().mockResolvedValue(mockBooks);
+      mockPaymentsService.createPaymentSession = jest.fn().mockResolvedValue("someSessionId");
       const itemIds = mockCart.items.map( (item) => item._id );
       mockOrderRepo.createOrder = jest.fn().mockResolvedValue(null);
 
@@ -142,7 +167,9 @@ describe('OrdersService', () => {
           }
         ],
         totalPrice: 132,
-        shippingAddress: "someShippingAddress"
+        shippingAddress: "someShippingAddress",
+        paymentSessionId: "someSessionId",
+        status: "PENDING"
       }
 
       const cartId = "validCartId";

@@ -6,6 +6,7 @@ import { PaymentGatewayModule } from 'src/gateway/payment-gateway.module';
 @Module({
   imports: [PaymentGatewayModule],
   providers: [PaymentsService],
-  controllers: [PaymentsController]
+  controllers: [PaymentsController],
+  exports: [PaymentsService],
 })
 export class PaymentsModule {}

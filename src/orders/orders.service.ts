@@ -3,13 +3,16 @@ import { OrdersRepository } from './orders.repository';
 import { CartsService } from '../carts/carts.service'
 import { BooksService } from '../books/books.service';
 import { SHIPPING_COST } from '../common/constants';
-import { Order, OrderDocument } from './schemas/Order.schema';
+import { Order } from './schemas/Order.schema';
+import { PaymentsService } from '../payments/payments.service';
+import { InternalServerErrorException } from '@nestjs/common';
 
 @Injectable()
 export class OrdersService {
     constructor( 
         private readonly cartsService: CartsService, 
         private readonly booksService: BooksService, 
+        private readonly paymentsService: PaymentsService,
         private readonly orderRepository: OrdersRepository
     ) {}
 
@@ -30,10 +33,20 @@ export class OrdersService {
         const orderItems = this.createOrderItemsFromCart( cart, bookMap );
         const totalPrice = this.calculateTotalPrice( orderItems );
 
+
+        // create payment session 
+        const sessionId = await this.paymentsService.createPaymentSession( totalPrice, 'USD', cartId );
+        if(!sessionId) {
+            throw new InternalServerErrorException("Failed to create payment session");
+        }
+
+
         const orderData = {
             items: orderItems,
             totalPrice,
             shippingAddress,
+            paymentSessionId: sessionId,
+            status: 'PENDING',
         };
 
         const createdOrder = await this.orderRepository.createOrder( orderData as any );

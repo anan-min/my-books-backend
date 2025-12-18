@@ -8,11 +8,13 @@ import { CartsModule } from 'src/carts/carts.module';
 import { BooksModule } from 'src/books/books.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { OrderSchema } from './schemas/Order.schema';
+import { PaymentsModule } from 'src/payments/payments.module';
 
 @Module({
   imports: [  CartsModule, 
               BooksModule, 
-              MongooseModule.forFeature([{ name: 'Order', schema:  OrderSchema }])
+              PaymentsModule,
+              MongooseModule.forFeature([{ name: 'Order', schema:  OrderSchema }]),
           ],
   controllers: [OrdersController],
   providers: [ 

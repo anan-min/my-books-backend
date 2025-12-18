@@ -29,22 +29,22 @@ describe('PaymentGateway', () => {
         // it should return session_id 
         it('should return session_id', async () => {
             mockHttpService.post = jest.fn().mockReturnValueOnce(of({ data: { sessionId: 'test_session_id' }}));
-            const result = service.createPaymentSession(1000, 'USD', 'order123');
+            const result = service.createPaymentSession(1000, 'USD', 'cartId12354');
             expect(result).resolves.toEqual('test_session_id');
         });
         // it should call httpService.post with correct parameters
         it('should call httpservice.post with correct parameters', async () => {
             mockHttpService.post = jest.fn().mockReturnValueOnce(of({ data: { sessionId: 'test_session_id' }}));
-            await service.createPaymentSession(1000, 'USD', 'order123');
-            const request = {amount: 1000, currency: 'USD', orderId: 'order123'}
+            await service.createPaymentSession(1000, 'USD', 'cartId12315');
+            const request = {amount: 1000, currency: 'USD', cartId: 'cartId12315'}
 
-            expect(mockHttpService.post).toHaveBeenCalledWith('https://localhost:6969/payments/session', request);
+            expect(mockHttpService.post).toHaveBeenCalledWith('http://localhost:6969/payments/session', request);
             expect(mockHttpService.post).toHaveBeenCalledTimes(1);
         });
         // it should handle errors from httpService.post
         it('should handle errors from httpservice.post', () => {
             mockHttpService.post = jest.fn().mockReturnValueOnce({ toPromise: () => { throw new Error("HTTP Error") } });
-            const result = service.createPaymentSession(1000, 'USD', 'order123');
+            const result = service.createPaymentSession(1000, 'USD', 'cartId12354');
             expect(result).rejects.toThrow(InternalServerErrorException);
         });
     })
@@ -59,7 +59,7 @@ describe('PaymentGateway', () => {
             service.processPayments('test_session_id', true);
             const request = {sessionId: 'test_session_id', success: true}
             
-            expect(mockHttpService.post).toHaveBeenCalledWith('https://localhost:6969/payments/pay', request);
+            expect(mockHttpService.post).toHaveBeenCalledWith('http://localhost:6969/payments/pay', request);
             expect(mockHttpService.post).toHaveBeenCalledTimes(1);
         });
 
